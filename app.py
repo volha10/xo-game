@@ -22,15 +22,10 @@ new_game_model_request = api.model("NewGameRequest", {
     "user_id": fields.Integer(required=True)
 })
 
-_inner_position_model = api.model("_PositionModel", {
-    "x": fields.Integer(),
-    "y": fields.Integer()
-})
-
-step_model = api.model("StepOverviewModel", {
-    "step": fields.Integer(),
+step_model = api.model("TurnOverviewModel", {
+    "turn_number": fields.Integer(),
     "mark": fields.Integer(),
-    "position": fields.Nested(_inner_position_model)
+    "position": fields.Integer()
 })
 
 game_model_response = api.model("GameResponse", {
@@ -38,6 +33,7 @@ game_model_response = api.model("GameResponse", {
     "user_id": fields.Integer(),
     "user_mark": fields.String(max_length=1, ),  # TODO: fields.Integer(),
     "result": fields.String(max_length=1),  # TODO: fields.Integer(),
+    "total_turns": fields.Integer(),
     "overview": fields.List(fields.Nested(step_model)),
     "started_dttm": fields.DateTime,
     "finished_dttm": fields.DateTime,
@@ -70,10 +66,10 @@ class Games(Resource):
     @games_ns.marshal_with(game_model_response, code=201)
     def patch(self, game_id):
         # data = request.get_json()
-        step_overview = {
-                   "step": 1,
-                   "mark": 1,  # x=1 or 0=2
-                   "position": {"x": 1, "y": 1}
+        turn_overview = {
+                   "turn_number": 1,
+                   #"mark": 1,  # x=1 or 0=2
+                   "position": 5
                },
 
-        return views.make_move(game_id, step_overview), 201
+        return views.make_turn(db, game_id, turn_overview), 201
