@@ -23,6 +23,7 @@ class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_mark = db.Column(db.Enum(MarkType), nullable=False)
     result = db.Column(db.Enum(GameResultType))
+    total_turns = db.Column(db.Integer, default=0)
     overview = db.Column(JSON)
     started_dttm = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
     finished_dttm = db.Column(db.DateTime)
