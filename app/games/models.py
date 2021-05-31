@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.dialects.postgresql import JSON
 
 from app import db
-from enums import MarkType, GameResultType
+from app.games.enums import MarkType, GameResultType
 
 
 class User(db.Model):

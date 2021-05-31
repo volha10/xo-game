@@ -1,33 +1,21 @@
-import os
-
-from flask import Flask, request
-from flask_migrate import Migrate
-from flask_restx import Api, Resource, fields
-from flask_sqlalchemy import SQLAlchemy
+from flask import request
+from flask_restx import Resource, fields, Namespace
 
 
-app = Flask(__name__)
-app.config.from_object(os.environ["APP_SETTINGS"])
-
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-
-api = Api(app, version="1.0", title="XO Game API", description="A simple XO Game API")
-users_ns = api.namespace("users", description="User operations")
-games_ns = api.namespace("games", description="XO Game operations")
+games_ns = Namespace("games")
 
 
-new_game_model_request = api.model("NewGameRequest", {
+new_game_model_request = games_ns.model("NewGameRequest", {
     "user_id": fields.Integer(required=True)
 })
 
-step_model = api.model("TurnOverviewModel", {
+step_model = games_ns.model("TurnOverviewModel", {
     "turn_number": fields.Integer(),
     #"mark": fields.Integer(),
     "position": fields.Integer()
 })
 
-game_model_response = api.model("GameResponse", {
+game_model_response = games_ns.model("GameResponse", {
     "id": fields.Integer(),
     "user_id": fields.Integer(),
     "user_mark": fields.String(max_length=1, ),  # TODO: fields.Integer(),
@@ -40,8 +28,7 @@ game_model_response = api.model("GameResponse", {
 })
 
 
-#from models import User, Game
-import views
+from app.games import views
 
 
 @games_ns.route("/")
@@ -53,7 +40,7 @@ class NewGame(Resource):
         data = request.get_json()
         user_id = data.get("user_id")
 
-        return views.create_game(db, user_id), 201
+        return views.create_game(user_id), 201
 
 
 @games_ns.route("/<int:game_id>")
@@ -73,4 +60,4 @@ class Games(Resource):
                    "position": 5
         }
 
-        return views.make_turn(db, game_id, turn_overview), 201
+        return views.make_turn(game_id, turn_overview), 201
