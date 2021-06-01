@@ -34,7 +34,7 @@ from app.games import views
 @games_ns.route("/")
 class NewGame(Resource):
 
-    @games_ns.expect(new_game_model_request)
+    @games_ns.expect(new_game_model_request, validate=True)
     @games_ns.marshal_with(game_model_response, description="Created", code=201)
     def post(self):
         data = request.get_json()

@@ -7,11 +7,11 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
-def create_app():
+def create_app(app_config):
     app = Flask(__name__, instance_relative_config=True)
 
-    print(os.environ["APP_SETTINGS"])
-    app.config.from_object(os.environ["APP_SETTINGS"])
+    print(app_config)
+    app.config.from_object(app_config)
 
     db.init_app(app)
 

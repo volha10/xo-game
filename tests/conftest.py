@@ -1,16 +1,26 @@
 import pytest
 
 from app import create_app
+from app.games.enums import MarkType
+from app.games.models import Game, User
 
 
 @pytest.fixture
-def test_client():
-    app = create_app()
-    app.config['TESTING'] = True
+def app():
+    """Create and configure new instance for each test."""
+    app = create_app('config.TestingConfig')
 
-    # Create test client using Flask app configured for testing.
-    with app.test_client() as test_client_:
+    yield app
 
-        # Establish application context.
-        with app.app_context():
-            yield test_client_
+
+@pytest.fixture
+def client(app):
+    return app.test_client()
+
+
+@pytest.fixture
+def game_x(client):
+    user = User(id=555, email="user@example.com", name="Test User")
+    game = Game(id=999, user_mark=MarkType.X, user_id=user.id)
+
+    return game
