@@ -21,6 +21,6 @@ def client(app):
 @pytest.fixture
 def game_x(client):
     user = User(id=555, email="user@example.com", name="Test User")
-    game = Game(id=999, user_mark=MarkType.X, user_id=user.id)
+    game = Game(id=999, user_mark=MarkType.X, user_id=user.id, total_turns=0, overview=[], started_dttm="2021-05-31T10:00:00")
 
     return game
