@@ -5,4 +5,7 @@ python3 -m flask run
 # python3 -m flask db migrate -m "Initial migration"
 
 python3 -m flask db upgrade
+
+python -m pytest -v
+
   

@@ -1,8 +1,9 @@
 import random
 from typing import Dict, List
 
-from enums import MarkType, GameResultType
-from models import Game
+from app import db
+from app.games.enums import MarkType, GameResultType
+from app.games.models import Game
 
 WINNING_COMBINATIONS = [
     {1, 2, 3},
@@ -17,7 +18,8 @@ WINNING_COMBINATIONS = [
 
 BOARD = 3 * 3
 
-def create_game(db, user_id: int) -> Game:
+
+def create_game(user_id: int) -> Game:
     """Create Game object."""
     user_mark = MarkType.X #TODO: #random.choice([1, 2])
 
@@ -41,7 +43,7 @@ def get_game(game_id: int) -> Game:
     return Game.query.get_or_404(game_id, description=f"Game {game_id} not found")
 
 
-def make_turn(db, game_id: int, turn_overview: Dict[str, int]) -> Game:
+def make_turn(game_id: int, turn_overview: Dict[str, int]) -> Game:
     game = Game.query.get_or_404(game_id, description=f"Game {game_id} not found")
 
     _turn_user(game, turn_overview)
