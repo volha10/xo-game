@@ -1,8 +1,13 @@
 from unittest.mock import patch
 
+from flask.testing import FlaskClient
+
+from app.games.models import Game
+from tests.conftest import client, app, game_x  # noqa
+
 
 @patch("app.games.views.get_game")
-def test_get_game(create_game_mock, client, game_x):
+def test_get_game(create_game_mock, client: FlaskClient, game_x: Game):
     create_game_mock.return_value = game_x
 
     response = client.get("/api/v1/games/999")
@@ -21,7 +26,7 @@ def test_get_game(create_game_mock, client, game_x):
     create_game_mock.assert_called_once_with(999)
 
 
-def test_get_game_if_not_found(client):
+def test_get_game_if_not_found(client: FlaskClient):
     response = client.get("/api/v1/games/999")
 
     assert response.json == {
@@ -33,7 +38,7 @@ def test_get_game_if_not_found(client):
 
 
 @patch("app.games.views.create_game")
-def test_create_new_game(create_game_mock, client, game_x):
+def test_create_new_game(create_game_mock, client: FlaskClient, game_x: Game):
     create_game_mock.return_value = game_x
     user_id = 555
 
@@ -54,7 +59,7 @@ def test_create_new_game(create_game_mock, client, game_x):
 
 
 @patch("app.games.views.make_turn")
-def test_patch_game(make_turn_mock, client, game_x):
+def test_patch_game(make_turn_mock, client: FlaskClient, game_x: Game):
     user_turn_request = {
         "turn_number": 1,
         "position": 5
@@ -92,7 +97,7 @@ def test_patch_game(make_turn_mock, client, game_x):
     make_turn_mock.assert_called_once_with(game_id, user_turn_request)
 
 
-def test_patch_game_if_not_found(client):
+def test_patch_game_if_not_found(client: FlaskClient):
     response = client.patch("/api/v1/games/111")
 
     assert response.json == {
