@@ -1,4 +1,5 @@
 import random
+from datetime import datetime
 from typing import Dict, List
 
 from app import db
@@ -17,25 +18,30 @@ WINNING_COMBINATIONS = [
 ]
 
 BOARD = 3 * 3
+WINNING_SEQUENCE = 3
+
+
+class UpdatingFinishedGameError(Exception):
+    pass
 
 
 def create_game(user_id: int) -> Game:
     """Create Game object."""
-    user_mark = MarkType.X #TODO: #random.choice([1, 2])
+    user_mark = random.choice(MarkType.list())
 
     game = Game(user_id=user_id, user_mark=user_mark)
-    db.session.add(game)
 
     if _is_computer_turns_first(user_mark):
         _turn_computer(game)
 
+    db.session.add(game)
     db.session.commit()
 
     return game
 
 
 def _is_computer_turns_first(user_mark: MarkType) -> bool:
-    return True if user_mark == MarkType.O else None
+    return True if user_mark == MarkType.O.value else False
 
 
 def get_game(game_id: int) -> Game:
@@ -45,6 +51,9 @@ def get_game(game_id: int) -> Game:
 
 def make_turn(game_id: int, turn_overview: Dict[str, int]) -> Game:
     game = Game.query.get_or_404(game_id, description=f"Game {game_id} not found")
+
+    if game.result:
+        raise UpdatingFinishedGameError("Game %s over." % game_id)
 
     _turn_user(game, turn_overview)
 
@@ -58,28 +67,28 @@ def make_turn(game_id: int, turn_overview: Dict[str, int]) -> Game:
 
 
 def _turn_user(game: Game, turn_overview: Dict[str, int]) -> None:
-    turn_overview["mark"] = game.user_mark
+    turn_overview["mark"] = game.user_mark.value
 
-    game.overview = turn_overview
+    game.overview.append(turn_overview)
     game.total_turns += 1
 
-    _check_game_over(game, mark_to_check=game.user_mark)
+    _set_game_result(game, mark_to_check=game.user_mark.value)
 
 
 def _turn_computer(game: Game) -> None:
-    computer_mark = MarkType.O if game.user_mark == MarkType.X else MarkType.X
+    computer_mark = MarkType.O.value if game.user_mark == MarkType.X else MarkType.X.value
 
-    step_overview = {
-        "turn_number": game.total_turns + 1,
+    game.total_turns += 1
+    turn_overview = {
+        "turn_number": game.total_turns,
         "position": _generate_position(game.overview),
         "mark": computer_mark
     }
 
     # Update game overview.
-    game.overview = step_overview
-    game.total_turns += 1
+    game.overview.append(turn_overview)
 
-    _check_game_over(game, mark_to_check=computer_mark)
+    _set_game_result(game, mark_to_check=computer_mark)
 
 
 def _generate_position(turns_overview: List[Dict[str, int]]) -> int:
@@ -88,21 +97,28 @@ def _generate_position(turns_overview: List[Dict[str, int]]) -> int:
     while True:
         generated_position = random.randint(1, 9)
 
-        if generated_position in [unavailable_positions]:
+        if generated_position in unavailable_positions:
             continue
         return generated_position
 
 
-def _check_game_over(game: Game, mark_to_check: MarkType) -> None:
+def _set_game_result(game: Game, mark_to_check: str) -> None:
     turns = [item["position"] for item in game.overview if item["mark"] == mark_to_check]
+
+    if len(turns) < WINNING_SEQUENCE:
+        return
 
     # Check if win/lose.
     for win_combination in WINNING_COMBINATIONS:
-        if len(win_combination & set(turns)) == 3:
-            game.result = GameResultType.WIN if mark_to_check == game.user_mark else GameResultType.LOSE
-            return
+        if len(win_combination & set(turns)) == WINNING_SEQUENCE:
+            game.result = GameResultType.WIN.value if mark_to_check == game.user_mark.value \
+                else GameResultType.LOSE.value
+            break
+    else:
+        # Check if draw.
+        if game.total_turns == BOARD:
+            game.result = GameResultType.DRAW.value
 
-    # Check if draw.
-    if game.total_turns == BOARD:
-        game.result = GameResultType.DRAW
+    if game.result:
+        game.finished_dttm = datetime.utcnow()
 

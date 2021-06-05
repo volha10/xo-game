@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: bf9826a6e2e8
+Revision ID: 8e712fbc4f98
 Revises: 
-Create Date: 2021-05-23 21:07:36.764185
+Create Date: 2021-06-05 17:24:04.194385
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'bf9826a6e2e8'
+revision = '8e712fbc4f98'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -30,7 +30,8 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_mark', sa.Enum('X', 'O', name='marktype'), nullable=False),
     sa.Column('result', sa.Enum('WIN', 'LOSE', 'DRAW', name='gameresulttype'), nullable=True),
-    sa.Column('overview', postgresql.JSON(astext_type=sa.Text()), nullable=True),
+    sa.Column('total_turns', sa.Integer(), nullable=True),
+    sa.Column('overview', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
     sa.Column('started_dttm', sa.DateTime(), nullable=False),
     sa.Column('finished_dttm', sa.DateTime(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
