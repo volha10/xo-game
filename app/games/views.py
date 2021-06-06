@@ -25,6 +25,10 @@ class UpdatingFinishedGameError(Exception):
     pass
 
 
+class GameNotFoundError(Exception):
+    pass
+
+
 def create_game(user_id: int) -> Game:
     """Create Game object."""
     user_mark = random.choice(MarkType.list())
@@ -44,14 +48,20 @@ def _is_computer_turns_first(user_mark: MarkType) -> bool:
     return True if user_mark == MarkType.O.value else False
 
 
-def get_game(game_id: int) -> Game:
+def get_game(game_id: int, user_id: int) -> Game:
     """Get Game object."""
-    return Game.query.get_or_404(game_id, description=f"Game {game_id} not found")
+    game = Game.query.filter_by(id=game_id, user_id=user_id).first()
+
+    if not game:
+        raise GameNotFoundError("Game %s not found." % game_id)
+    return game
 
 
-def make_turn(game_id: int, turn_overview: Dict[str, int]) -> Game:
-    game = Game.query.get_or_404(game_id, description=f"Game {game_id} not found")
+def make_turn(game_id: int, turn_overview: Dict[str, int], user_id: int) -> Game:
+    game = Game.query.filter_by(id=game_id, user_id=user_id).first()
 
+    if not game:
+        raise GameNotFoundError("Game %s not found." % game_id)
     if game.result:
         raise UpdatingFinishedGameError("Game %s over." % game_id)
 
