@@ -9,7 +9,7 @@ from app.games.models import Game
 @pytest.fixture
 def app():
     """Create and configure new instance for each test."""
-    app = create_app('config.TestingConfig')
+    app = create_app('app.config.TestingConfig')
 
     yield app
 
