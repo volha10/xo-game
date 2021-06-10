@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  flask:
+    container_name: xo-game-flask
+    build: ./flask
+    command: sh -c "flask db upgrade && flask run -h 0.0.0.0"
+    volumes:
+      - ./flask/:/code/
+    ports:
+      - "8080:5000"
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+  db:
+    container_name: xo-game-pg
+    image: postgres:13-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./.env
+  nginx:
+    container_name: xo-game-nginx
+    build: ./nginx
+    image: nginx:1.21.0
+    ports:
+      - "81:80"
+    depends_on:
+      - flask
+
+volumes:
+  postgres_data:

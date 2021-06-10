@@ -1,7 +1,6 @@
 from flask_bcrypt import generate_password_hash, check_password_hash
 
 from app import db
-from app.games.models import Game
 
 
 class User(db.Model):
