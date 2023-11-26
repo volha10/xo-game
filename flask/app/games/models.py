@@ -1,31 +1,26 @@
-from datetime import datetime
-
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.mutable import MutableList
 
 from app import db
-from app.games.enums import MarkType, GameResultType
 
 
 class Game(db.Model):
-    __tablename__ = "games"
+    __tablename__ = "game"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_mark = db.Column(db.Enum(MarkType), nullable=False)
-    result = db.Column(db.Enum(GameResultType))
-    total_turns = db.Column(db.Integer)
+    total_turns = db.Column(db.Integer, default=0)
     overview = db.Column(MutableList.as_mutable(JSONB))
-    started_dttm = db.Column(db.DateTime, nullable=False)
+    created_dttm = db.Column(db.DateTime, nullable=False)
     finished_dttm = db.Column(db.DateTime)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
-    def __init__(self, user_mark, user_id, result=None, total_turns=0, overview=None, started_dttm=datetime.utcnow()):
-        self.user_mark = user_mark
-        self.result = result
-        self.total_turns = total_turns
-        self.overview = overview or []
-        self.started_dttm = started_dttm
-        self.user_id = user_id
 
-    def __repr__(self):
-        return "User %s - Game %s - Result %s" % (self.user_id, self.id, self.result)
+class UserGame(db.Model):
+    __tablename__ = "user_x_game"
+
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
+    game_id = db.Column(db.Integer, db.ForeignKey("game.id"), primary_key=True)
+    game_result = db.Column(db.Integer, nullable=False)
+    mark = db.Column(db.Integer, nullable=False)
+
+    user = db.relationship("user", back_populates="games")
+    game = db.relationship("game", back_populates="users")
