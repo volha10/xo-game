@@ -2,14 +2,16 @@ import pytest
 
 from app import create_app
 from app.auth.models import User
-from app.games.enums import MarkType
-from app.games.models import Game
+from app.games import schemas as games_schemas
+
+USER_1 = {"id": 1, "mark": "X"}
+USER_2 = {"id": 2, "mark": "O"}
 
 
 @pytest.fixture
 def app():
     """Create and configure new instance for each test."""
-    app = create_app('app.config.TestingConfig')
+    app = create_app("app.config.TestingConfig")
 
     yield app
 
@@ -28,8 +30,19 @@ def user(client):
 
 
 @pytest.fixture
-def game_x(client, user):
-    game = Game(user_mark=MarkType.X, user_id=user.id, started_dttm="2021-05-31T10:00:00")
-    game.id = 999
+def game_schema(client) -> games_schemas.GameSchema:
 
-    return game
+    ru1_schema = games_schemas.RelatedUserSchema.model_validate(USER_1)
+    gu1_schema = games_schemas.GameUserSchema(user=ru1_schema, mark=USER_1["mark"])
+
+    ru2_schema = games_schemas.RelatedUserSchema.model_validate(USER_2)
+    gu2_schema = games_schemas.GameUserSchema(user=ru2_schema, mark=USER_2["mark"])
+
+    game_schema = games_schemas.GameSchema(
+        id=1,
+        total_turns=0,
+        created_dttm="2021-05-31T10:00:00",
+        users=[gu1_schema, gu2_schema],
+    )
+
+    return game_schema

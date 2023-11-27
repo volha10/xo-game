@@ -1,6 +1,7 @@
 from flask import request
 from flask_restx import Resource
 
+from app.games import schemas
 from app.games import views
 from app.games.namespaces import (
     games_ns,
@@ -18,8 +19,8 @@ class NewGame(Resource):
         players = data["users"]
 
         result = views.create_game(
-            views.NewGameUserSchema.model_validate(players[0]),
-            views.NewGameUserSchema.model_validate(players[1]),
+            schemas.NewGameUserSchema.model_validate(players[0]),
+            schemas.NewGameUserSchema.model_validate(players[1]),
         )
 
         return result.model_dump(), 201
