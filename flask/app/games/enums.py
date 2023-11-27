@@ -14,7 +14,13 @@ class MarkType(enum.Enum):
 
 
 class GameResultLabel(enum.Enum):
-    WIN = "WIN"
-    LOSE = "LOSS"
-    DRAW = "DRAW"
-    NONE = "NONE"
+    WIN = 2
+    LOSS = 0
+    DRAW = 1
+
+    def __str__(self):
+        return self.name
+
+    @staticmethod
+    def list():
+        return [result.name for result in GameResultLabel]

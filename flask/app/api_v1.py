@@ -4,7 +4,7 @@ from flask_restx import Api
 
 from app.auth.controllers import auth_ns
 from app.auth.views import InvalidEmailOrPasswordError
-from app.games.namespaces import games_ns
+from app.games.controllers import games_ns
 from app.games.views import UpdatingFinishedGameError, GameNotFoundError
 
 api_v1 = Blueprint("api", __name__, url_prefix="/api/v1")
