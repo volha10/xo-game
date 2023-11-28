@@ -32,3 +32,12 @@ class Games(Resource):
         result = views.get_game(game_id)
 
         return result.model_dump(), 200
+
+    @games_ns.expect(namespaces.turn_model)
+    @games_ns.marshal_with(namespaces.game_board_response_model, code=201)
+    def patch(self, game_id):
+        turn = request.get_json()
+        user_id = 1
+        result = views.make_turn(game_id, user_id, schemas.Turn.model_validate(turn))
+
+        return result.model_dump(), 201

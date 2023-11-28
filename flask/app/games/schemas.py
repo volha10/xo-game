@@ -6,6 +6,12 @@ from pydantic import BaseModel
 from app.games.enums import MarkType, GameResultLabel
 
 
+class Turn(BaseModel):
+    turn_number: int
+    mark: str
+    position: int
+
+
 class NewGameUserSchema(BaseModel):
     id: int
     mark: MarkType
@@ -32,7 +38,7 @@ class GameUserSchema(BaseModel):
 class GameBoardSchema(BaseModel):
     id: int
     total_turns: int
-    turns_overview: list = []
+    turns_overview: List[Turn] = []
     created_dttm: datetime
     finished_dttm: Optional[datetime] = None
 

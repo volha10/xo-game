@@ -38,7 +38,7 @@ def handle_invalid_error_or_password_error(error):
 
 @api.errorhandler(GameNotFoundError)
 def handle_game_not_found_error(error):
-    return {"message": str(error)}, 404
+    return {"message": str(error)}, 400
 
 
 @api.errorhandler(UpdatingFinishedGameError)
