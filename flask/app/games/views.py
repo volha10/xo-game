@@ -55,16 +55,22 @@ def create_game(
     return games_schemas.GameSchema.from_orm(game)
 
 
-def get_game(game_id: int) -> games_schemas.GameBoardSchema:
-    game = games_models.Game.query.filter_by(id=game_id).first()
+def get_game(game_id: int, user_id: int) -> games_schemas.GameBoardSchema:
+    user_game = games_models.UserGame.query.filter_by(
+        game_id=game_id, user_id=user_id
+    ).first()
 
-    if not game:
+    if not user_game:
         raise GameNotFoundError("Game %s not found." % game_id)
-    return games_schemas.GameBoardSchema.from_orm(game)
+    return games_schemas.GameBoardSchema.from_orm(user_game.game)
 
 
-def make_turn(game_id: int, turn_user_id: id, turn: games_schemas.Turn) -> games_schemas.GameBoardSchema:
-    game = games_models.Game.query.filter_by(id=game_id).first()
+def make_turn(
+    game_id: int, turn_user_id: id, turn: games_schemas.Turn
+) -> games_schemas.GameBoardSchema:
+    game = games_models.UserGame.query.filter_by(
+        game_id=game_id, user_id=turn_user_id
+    ).first()
 
     if not game:
         raise GameNotFoundError("Game %s not found." % game_id)
@@ -72,7 +78,7 @@ def make_turn(game_id: int, turn_user_id: id, turn: games_schemas.Turn) -> games
         raise UpdatingFinishedGameError("Game %s is over." % game_id)
 
     _turn_user(game, turn)
-    _set_game_result(game, turn_user_id, turn_mark=turn.mark)
+    _set_game_result(game, turn_mark=turn.mark)
 
     db.session.add(game)
     db.session.commit()
@@ -85,7 +91,7 @@ def _turn_user(game: games_models.Game, turn: games_schemas.Turn) -> None:
     game.total_turns += 1
 
 
-def _set_game_result(game: games_models.Game, turn_user_id: id, turn_mark: str) -> None:
+def _set_game_result(game: games_models.Game, turn_mark: str) -> None:
     turns_history = [
         item["position"] for item in game.turns_overview if item["mark"] == turn_mark
     ]

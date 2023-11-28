@@ -52,5 +52,5 @@ def handle_jwt_exceptions(error):
 
 
 @api.errorhandler(Exception)
-def handle_unexpected_error(error):
-    return {"message": str(error)}, 500
+def handle_unexpected_error(_):
+    return {"message": "Internal error"}, 500

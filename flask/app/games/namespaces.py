@@ -8,20 +8,31 @@ games_ns = Namespace("games")
 _player_model = games_ns.model(
     "_Player",
     {
-        "id": fields.Integer(),
-        "mark": fields.String(enum=MarkType.list()),
-        "game_result": fields.String(
-            enum=GameResultLabel.list(),
-        ),
+        "id": fields.Integer(required=True),
+        "mark": fields.String(enum=MarkType.list(), required=True),
+        "game_result": fields.String(enum=GameResultLabel.list()),
     },
 )
 
 turn_model = games_ns.model(
     "Turn",
     {
-        "turn_number": fields.Integer(example=1), # todo: check 1-9
-        "mark": fields.String(enum=MarkType.list()),
-        "position": fields.Integer(example=1), # todo: check 1-9
+        "turn_number": fields.Integer(
+            example=1,
+            required=True,
+            min=1,
+            max=9,
+        ),
+        "mark": fields.String(
+            enum=MarkType.list(),
+            required=True,
+        ),
+        "position": fields.Integer(
+            example=1,
+            required=True,
+            min=1,
+            max=9,
+        ),
     },
 )
 
@@ -59,6 +70,7 @@ new_game_request_model = games_ns.model(
     {
         "users": fields.List(
             fields.Nested(_player_model),
+            required=True,
             example=[
                 {
                     "id": 1,

@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from flask.testing import FlaskClient
+from flask_jwt_extended import create_access_token
 
 from app.games import schemas as games_schemas
 from app.games import views
@@ -8,6 +9,7 @@ from app.games import views
 from tests.conftest import (
     client,  # noqa
     app,  # noqa
+    user, # noqa
     game_schema,  # noqa
     game_board_schema,  # noqa
     USER_1,
@@ -17,13 +19,16 @@ from tests.conftest import (
 
 @patch("app.games.views.create_game")
 def test_create_new_game_response_data_if_success(
-    create_game_mock, client: FlaskClient, game_schema: games_schemas.GameSchema
+    create_game_mock, client: FlaskClient, user, game_schema: games_schemas.GameSchema
 ):
     create_game_mock.return_value = game_schema
+    headers = {
+        "Authorization": f"Bearer {create_access_token(user.id)}"
+    }
 
     response = client.post(
         "/api/v1/games/",
-        json={"users": [USER_1, USER_2]},
+        json={"users": [USER_1, USER_2]}, headers=headers
     )
 
     assert response.json == {
@@ -41,33 +46,50 @@ def test_create_new_game_response_data_if_success(
 
 @patch("app.games.views.create_game")
 def test_create_new_game_response_code_if_success(
-    create_game_mock, client: FlaskClient, game_schema: games_schemas.GameSchema
+    create_game_mock, client: FlaskClient, user, game_schema: games_schemas.GameSchema
 ):
     create_game_mock.return_value = game_schema
 
+    headers = {
+        "Authorization": f"Bearer {create_access_token(user.id)}"
+    }
+
     response = client.post(
         "/api/v1/games/",
-        json={"users": [USER_1, USER_2]},
+        json={"users": [USER_1, USER_2]}, headers=headers
     )
 
     assert response.status_code == 201
 
 
+def test_get_game_response_if_unauthorized(client: FlaskClient):
+    response = client.get("/api/v1/games/999")
+
+    assert response.json == {
+        "message": "Missing Authorization Header"
+    }
+    assert response.status_code == 401
+
+
 @patch("app.games.views.get_game")
-def test_get_game_response_data_if_game_not_found(get_game_mock, client: FlaskClient):
+@patch("app.games.controllers.get_jwt_identity")
+@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request")
+def test_get_game_response_data_if_game_not_found(_, get_jwt_identity_mock,get_game_mock, user, client: FlaskClient):
     game_id = 999
+    get_jwt_identity_mock.return_value = user.id
     get_game_mock.side_effect = views.GameNotFoundError(f"Game {game_id} not found.")
 
     response = client.get(f"/api/v1/games/{game_id}")
 
-    assert response.json == {
-        "message": f"Game 999 not found."
-    }
+    assert response.json == {"message": f"Game 999 not found."}
 
 
 @patch("app.games.views.get_game")
-def test_get_game_response_code_if_game_not_found(get_game_mock, client: FlaskClient):
+@patch("app.games.controllers.get_jwt_identity")
+@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request")
+def test_get_game_response_code_if_game_not_found(_, get_jwt_identity_mock, get_game_mock, client: FlaskClient, user):
     game_id = 999
+    get_jwt_identity_mock.return_value = user.id
     get_game_mock.side_effect = views.GameNotFoundError(f"Game {game_id} not found.")
 
     response = client.get(f"/api/v1/games/{game_id}")
@@ -76,12 +98,18 @@ def test_get_game_response_code_if_game_not_found(get_game_mock, client: FlaskCl
 
 
 @patch("app.games.views.get_game")
+@patch("app.games.controllers.get_jwt_identity")
+@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request")
 def test_get_game_response_data_if_success(
+    _,
+    get_jwt_identity_mock,
     get_game_mock,
     client: FlaskClient,
+    user,
     game_board_schema: games_schemas.GameBoardSchema,
 ):
     get_game_mock.return_value = game_board_schema
+    get_jwt_identity_mock.return_value = user.id
 
     response = client.get(f"/api/v1/games/{game_board_schema.id}")
 
@@ -98,37 +126,53 @@ def test_get_game_response_data_if_success(
 
 
 @patch("app.games.views.get_game")
+@patch("app.games.controllers.get_jwt_identity")
+@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request")
 def test_get_game_response_code_if_success(
+    _,
+    get_jwt_identity_mock,
     get_game_mock,
     client: FlaskClient,
+    user,
     game_board_schema: games_schemas.GameBoardSchema,
 ):
     get_game_mock.return_value = game_board_schema
+    get_jwt_identity_mock.return_value = user.id
 
     response = client.get(f"/api/v1/games/{game_board_schema.id}")
 
     assert response.status_code == 200
 
 
+@patch("app.games.controllers.get_jwt_identity")
+@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request")
 def test_patch_game_response_data_if_game_not_found(
+    _,
+    get_jwt_identity_mock,
     client: FlaskClient,
+    user,
     game_board_schema: games_schemas.GameBoardSchema,
 ):
     game_id = 999
+    get_jwt_identity_mock.return_value = user.id
     turn_request_data = game_board_schema.turns_overview[1]
 
     response = client.patch(f"/api/v1/games/{game_id}", json=dict(turn_request_data))
 
-    assert response.json == {
-        "message": "Game 999 not found."
-    }
+    assert response.json == {"message": "Game 999 not found."}
 
 
+@patch("app.games.controllers.get_jwt_identity")
+@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request")
 def test_patch_game_response_code_if_game_not_found(
+    _,
+    get_jwt_identity_mock,
     client: FlaskClient,
+    user,
     game_board_schema: games_schemas.GameBoardSchema,
 ):
     game_id = 999
+    get_jwt_identity_mock.return_value = user.id
     turn_request_data = game_board_schema.turns_overview[1]
 
     response = client.patch(f"/api/v1/games/{game_id}", json=dict(turn_request_data))
@@ -137,11 +181,17 @@ def test_patch_game_response_code_if_game_not_found(
 
 
 @patch("app.games.views.make_turn")
+@patch("app.games.controllers.get_jwt_identity")
+@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request")
 def test_patch_game_response_data_if_success(
+    _,
+    get_jwt_identity_mock,
     make_turn_mock,
     client: FlaskClient,
+    user,
     game_board_schema: games_schemas.GameBoardSchema,
 ):
+    get_jwt_identity_mock.return_value = user.id
     make_turn_mock.return_value = game_board_schema
     turn_request_data = game_board_schema.turns_overview[1]
 
@@ -162,11 +212,17 @@ def test_patch_game_response_data_if_success(
 
 
 @patch("app.games.views.make_turn")
+@patch("app.games.controllers.get_jwt_identity")
+@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request")
 def test_patch_game_response_code_if_success(
+    _,
+    get_jwt_identity_mock,
     make_turn_mock,
     client: FlaskClient,
+    user,
     game_board_schema: games_schemas.GameBoardSchema,
 ):
+    get_jwt_identity_mock.return_value = user.id
     make_turn_mock.return_value = game_board_schema
     user_turn_request = game_board_schema.turns_overview[1]
 
