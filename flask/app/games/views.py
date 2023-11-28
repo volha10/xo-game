@@ -18,7 +18,6 @@ def create_game(
     player_schema_1: games_schemas.NewGameUserSchema,
     player_schema_2: games_schemas.NewGameUserSchema,
 ) -> games_schemas.GameSchema:
-    """Create Game object."""
     game = games_models.Game()
     db.session.add(game)
     db.session.commit()
@@ -37,3 +36,11 @@ def create_game(
     db.session.commit()
 
     return games_schemas.GameSchema.from_orm(game)
+
+
+def get_game(game_id: int) -> games_schemas.GameBoardSchema:
+    game = games_models.Game.query.filter_by(id=game_id).first()
+
+    if not game:
+        raise GameNotFoundError("Game %s not found." % game_id)
+    return games_schemas.GameBoardSchema.from_orm(game)

@@ -24,12 +24,23 @@ _player_model = games_ns.model(
     },
 )
 
+game_board_response_model = games_ns.model(
+    "GameBoard",
+    {
+        "id": fields.Integer(),
+        "total_turns": fields.Integer(),
+        "turns_overview": fields.List(fields.Nested(_turn_model), default=[]),
+        "created_dttm": fields.DateTime,
+        "finished_dttm": fields.DateTime,
+    },
+)
+
 game_response_model = games_ns.model(
     "Game",
     {
         "id": fields.Integer(),
         "total_turns": fields.Integer(),
-        "turns_overview": fields.List(fields.Nested(_turn_model), default=[]),
+        # "turns_overview": fields.List(fields.Nested(_turn_model), default=[]),
         "created_dttm": fields.DateTime,
         "finished_dttm": fields.DateTime,
         "users": fields.List(

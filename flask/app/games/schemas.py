@@ -29,6 +29,18 @@ class GameUserSchema(BaseModel):
         from_attributes = True
 
 
+class GameBoardSchema(BaseModel):
+    id: int
+    total_turns: int
+    turns_overview: list = []
+    created_dttm: datetime
+    finished_dttm: Optional[datetime] = None
+
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
+
 class GameSchema(BaseModel):
     id: int
     total_turns: int
