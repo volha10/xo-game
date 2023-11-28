@@ -46,3 +46,16 @@ def game_schema(client) -> games_schemas.GameSchema:
     )
 
     return game_schema
+
+
+@pytest.fixture
+def game_board_schema(client) -> games_schemas.GameBoardSchema:
+    return games_schemas.GameBoardSchema(
+        id=1,
+        total_turns=2,
+        turns_overview=[
+            {"turn_number": 1, "position": 5, "mark": "X"},
+            {"turn_number": 2, "position": 1, "mark": "O"},
+        ],
+        created_dttm="2021-05-31T10:00:00",
+    )

@@ -2,15 +2,22 @@ from unittest.mock import patch
 
 from flask.testing import FlaskClient
 
-from app.games import schemas
+from app.games import schemas as games_schemas
 from app.games import views
 
-from tests.conftest import client, app, game_schema, USER_1, USER_2  # noqa
+from tests.conftest import (
+    client,  # noqa
+    app,  # noqa
+    game_schema,  # noqa
+    game_board_schema,  # noqa
+    USER_1,
+    USER_2,
+)
 
 
 @patch("app.games.views.create_game")
 def test_create_new_game_response_data_if_success(
-    create_game_mock, client: FlaskClient, game_schema: schemas.GameSchema
+    create_game_mock, client: FlaskClient, game_schema: games_schemas.GameSchema
 ):
     create_game_mock.return_value = game_schema
 
@@ -34,7 +41,7 @@ def test_create_new_game_response_data_if_success(
 
 @patch("app.games.views.create_game")
 def test_create_new_game_response_code_if_success(
-    create_game_mock, client: FlaskClient, game_schema: schemas.GameSchema
+    create_game_mock, client: FlaskClient, game_schema: games_schemas.GameSchema
 ):
     create_game_mock.return_value = game_schema
 
@@ -68,3 +75,39 @@ def test_get_game_response_code_if_game_not_found(get_game_mock, client: FlaskCl
     response = client.get(f"/api/v1/games/{game_id}")
 
     assert response.status_code == 404
+
+
+@patch("app.games.views.get_game")
+def test_get_game_response_data_if_success(
+    get_game_mock,
+    client: FlaskClient,
+    game_board_schema: games_schemas.GameBoardSchema,
+):
+    get_game_mock.return_value = game_board_schema
+
+    response = client.get(f"/api/v1/games/{game_board_schema.id}")
+
+    assert response.json == {
+        "id": 1,
+        "total_turns": 2,
+        "turns_overview": [
+            {"turn_number": 1, "position": 5, "mark": "X"},
+            {"turn_number": 2, "position": 1, "mark": "O"},
+        ],
+        "created_dttm": "2021-05-31T10:00:00",
+        "finished_dttm": None,
+    }
+    assert response.status_code == 200
+
+
+@patch("app.games.views.get_game")
+def test_get_game_response_code_if_success(
+    get_game_mock,
+    client: FlaskClient,
+    game_board_schema: games_schemas.GameBoardSchema,
+):
+    get_game_mock.return_value = game_board_schema
+
+    response = client.get(f"/api/v1/games/{game_board_schema.id}")
+
+    assert response.status_code == 200
