@@ -68,12 +68,15 @@ def get_game(game_id: int, user_id: int) -> games_schemas.GameBoardSchema:
 def make_turn(
     game_id: int, turn_user_id: id, turn: games_schemas.Turn
 ) -> games_schemas.GameBoardSchema:
-    game = games_models.UserGame.query.filter_by(
+    user_game = games_models.UserGame.query.filter_by(
         game_id=game_id, user_id=turn_user_id
     ).first()
 
-    if not game:
+    if not user_game:
         raise GameNotFoundError("Game %s not found." % game_id)
+
+    game = user_game.game
+
     if game.finished_dttm:
         raise UpdatingFinishedGameError("Game %s is over." % game_id)
 
