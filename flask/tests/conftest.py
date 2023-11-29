@@ -1,6 +1,7 @@
 import pytest
 
 from app import create_app
+from app.auth import schemas as user_schemas
 from app.auth.models import User
 from app.games import schemas as games_schemas
 
@@ -22,7 +23,7 @@ def client(app):
 
 
 @pytest.fixture
-def user(client):
+def user():
     user = User(email="user@example.com", name="Test User", password="secret")
     user.id = 555
 
@@ -30,8 +31,7 @@ def user(client):
 
 
 @pytest.fixture
-def game_schema(client) -> games_schemas.GameSchema:
-
+def game_schema() -> games_schemas.GameSchema:
     ru1_schema = games_schemas.RelatedUserSchema.model_validate(USER_1)
     gu1_schema = games_schemas.GameUserSchema(user=ru1_schema, mark=USER_1["mark"])
 
@@ -46,6 +46,11 @@ def game_schema(client) -> games_schemas.GameSchema:
     )
 
     return game_schema
+
+
+@pytest.fixture
+def games_schema(game_schema) -> games_schemas.UserGamesSchema:
+    return games_schemas.UserGamesSchema(games=[game_schema])
 
 
 @pytest.fixture

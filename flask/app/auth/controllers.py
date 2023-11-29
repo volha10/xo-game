@@ -7,7 +7,7 @@ from app.auth.namespaces import (
     signup_request_model,
     signup_response_model,
     login_request_model,
-    login_response_model,
+    login_response_model
 )
 
 

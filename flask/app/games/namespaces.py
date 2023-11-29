@@ -52,7 +52,7 @@ game_response_model = games_ns.model(
     {
         "id": fields.Integer(),
         "total_turns": fields.Integer(),
-        # "turns_overview": fields.List(fields.Nested(_turn_model), default=[]),
+        "turns_overview": fields.List(fields.Nested(turn_model), default=[]),
         "created_dttm": fields.DateTime,
         "finished_dttm": fields.DateTime,
         "users": fields.List(
@@ -83,4 +83,8 @@ new_game_request_model = games_ns.model(
             ],
         )
     },
+)
+
+user_games_response_model = games_ns.model(
+    "UserGames", {"games": fields.List(fields.Nested(game_response_model))}
 )

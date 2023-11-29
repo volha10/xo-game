@@ -1,5 +1,6 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import List
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -50,6 +51,7 @@ class GameBoardSchema(BaseModel):
 class GameSchema(BaseModel):
     id: int
     total_turns: int
+    turns_overview: List[Turn] = []
     created_dttm: datetime
     finished_dttm: Optional[datetime] = None
     users: Optional[List[GameUserSchema]] = []
@@ -57,9 +59,27 @@ class GameSchema(BaseModel):
     def model_dump(self, **kwargs):
         data = super(GameSchema, self).model_dump(**kwargs)
 
-        for a in data["users"]:
-            a["id"] = a["user"]["id"]
-            del a["user"]
+        for item in data["users"]:
+            item["id"] = item["user"]["id"]
+            del item["user"]
+
+        return data
+
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
+
+class UserGamesSchema(BaseModel):
+    games: List[GameSchema] = []
+
+    def model_dump(self, **kwargs):
+        data = super(UserGamesSchema, self).model_dump(**kwargs)
+
+        for game in data["games"]:
+            for user in game["users"]:
+                user["id"] = user["user"]["id"]
+                del user["user"]
 
         return data
 

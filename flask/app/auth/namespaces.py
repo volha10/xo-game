@@ -20,5 +20,3 @@ login_request_model = auth_ns.model("LoginRequest", {
 login_response_model = auth_ns.model("LoginResponse", {
     "access_token": fields.String(required=True)
 })
-
-

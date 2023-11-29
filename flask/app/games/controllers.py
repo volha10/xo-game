@@ -9,7 +9,7 @@ from app.games.namespaces import games_ns
 
 
 @games_ns.route("/")
-class NewGame(Resource):
+class Games(Resource):
 
     @jwt_required()
     @games_ns.expect(namespaces.new_game_request_model, validate=True)
@@ -27,9 +27,17 @@ class NewGame(Resource):
 
         return result.model_dump(), 201
 
+    @jwt_required()
+    @games_ns.marshal_with(namespaces.user_games_response_model, code=200)
+    def get(self):
+        current_user_id = get_jwt_identity()
+        result = views.get_user_games(current_user_id)
+
+        return result.model_dump(), 200
+
 
 @games_ns.route("/<int:game_id>")
-class Games(Resource):
+class GameById(Resource):
 
     @jwt_required()
     @games_ns.marshal_with(namespaces.game_board_response_model, code=200)

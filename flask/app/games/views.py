@@ -1,12 +1,10 @@
 from datetime import datetime
+
 from app import db
-
 from app.auth import models as user_models
-
+from app.games import enums
 from app.games import models as games_models
 from app.games import schemas as games_schemas
-from app.games import enums
-
 
 WINNING_COMBINATIONS = [
     {1, 2, 3},
@@ -53,6 +51,13 @@ def create_game(
     db.session.commit()
 
     return games_schemas.GameSchema.from_orm(game)
+
+
+def get_user_games(user_id: id) -> games_schemas.UserGamesSchema:
+    user = user_models.User.query.filter_by(id=user_id).one()
+    game_schema_list = [games_schemas.GameSchema.from_orm(ug.game) for ug in user.games]
+
+    return games_schemas.UserGamesSchema(games=game_schema_list)
 
 
 def get_game(game_id: int, user_id: int) -> games_schemas.GameBoardSchema:
@@ -118,6 +123,6 @@ def _set_game_result(game: games_models.Game, turn_mark: str) -> None:
         # Check if draw.
         if game.total_turns == BOARD:
             for user in game.users:
-                user.game_result = enums.GameResultLabel.DRAW.value
+                user.game_result = enums.GameResultLabel.LOSS.value
 
             game.finished_dttm = datetime.utcnow()

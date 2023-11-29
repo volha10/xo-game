@@ -1,4 +1,4 @@
-## 1. How to start application 
+## 1. How to run application 
 
 ```
 docker-compose up
@@ -83,6 +83,16 @@ curl -X 'PATCH' \
 ```
 curl -X 'GET' \
   'http://localhost:81/api/v1/games/2' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer TOKEN_HERE'
+```
+
+
+#### 3.6 Get user's games
+
+```
+curl -X 'GET' \
+  'http://localhost:81/api/v1/games' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer TOKEN_HERE'
 ```
