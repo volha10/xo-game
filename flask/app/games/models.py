@@ -11,16 +11,18 @@ class Game(db.Model):
     __tablename__ = "game"
 
     id = db.Column(db.Integer, primary_key=True)
+    league_id = db.Column(db.Integer, db.ForeignKey("league.id"))
     total_turns = db.Column(db.Integer, default=0)
     turns_overview = db.Column(MutableList.as_mutable(JSONB))
     created_dttm = db.Column(db.DateTime, nullable=False)
     finished_dttm = db.Column(db.DateTime)
     users = relationship("UserGame", back_populates="game")
 
-    def __init__(self, total_turns=0, turns_overview=None, created_dttm=None):
-        self.total_turns = total_turns
-        self.turns_overview = turns_overview or []
-        self.created_dttm = created_dttm or datetime.utcnow()
+    def __init__(self, league_id: int):
+        self.league_id = league_id
+        self.total_turns = 0
+        self.turns_overview = []
+        self.created_dttm = datetime.utcnow()
 
 
 class UserGame(db.Model):

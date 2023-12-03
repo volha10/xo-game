@@ -1,9 +1,10 @@
 import pytest
 
 from app import create_app
-from app.auth import schemas as user_schemas
 from app.auth.models import User
 from app.games import schemas as games_schemas
+from app.management import models as management_models
+from app.management import schemas as management_schemas
 
 USER_1 = {"id": 1, "mark": "X"}
 USER_2 = {"id": 2, "mark": "O"}
@@ -40,6 +41,7 @@ def game_schema() -> games_schemas.GameSchema:
 
     game_schema = games_schemas.GameSchema(
         id=1,
+        league_id=1,
         total_turns=0,
         created_dttm="2021-05-31T10:00:00",
         users=[gu1_schema, gu2_schema],
@@ -63,4 +65,27 @@ def game_board_schema(client) -> games_schemas.GameBoardSchema:
             {"turn_number": 2, "position": 1, "mark": "O"},
         ],
         created_dttm="2021-05-31T10:00:00",
+    )
+
+
+@pytest.fixture
+def league() -> management_models.League:
+    league = management_models.League(
+        name="Test League",
+        started_at="2021-05-31T10:00:00",
+    )
+    league.id = 1
+    return league
+
+
+@pytest.fixture()
+def league_schema() -> management_schemas.RankTable:
+    return management_schemas.RankTable(
+        rank_table=[
+            {
+                "rank_number": 1,
+                "user_id": 1,
+                "total_result": 100,
+            }
+        ]
     )

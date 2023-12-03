@@ -30,10 +30,11 @@ class GameNotFoundError(Exception):
 
 
 def create_game(
-    player_schema_1: games_schemas.NewGameUserSchema,
-    player_schema_2: games_schemas.NewGameUserSchema,
+    player_schema_1: games_schemas.GameCreateSchema,
+    player_schema_2: games_schemas.GameCreateSchema,
+    league_id: int,
 ) -> games_schemas.GameSchema:
-    game = games_models.Game()
+    game = games_models.Game(league_id=league_id)
     db.session.add(game)
     db.session.commit()
 

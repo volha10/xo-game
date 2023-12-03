@@ -6,6 +6,8 @@ from app.auth.controllers import auth_ns
 from app.auth.views import InvalidEmailOrPasswordError
 from app.games.controllers import games_ns
 from app.games.views import UpdatingFinishedGameError, GameNotFoundError
+from app.management.controllers import management_ns
+from app.management.views import NoLeaguesFoundError
 
 api_v1 = Blueprint("api", __name__, url_prefix="/api/v1")
 
@@ -29,6 +31,12 @@ api = Api(
 
 api.add_namespace(auth_ns)
 api.add_namespace(games_ns)
+api.add_namespace(management_ns)
+
+
+@api.errorhandler(NoLeaguesFoundError)
+def handle_no_leagues_found_error(error):
+    return {"message": str(error)}, 400
 
 
 @api.errorhandler(InvalidEmailOrPasswordError)

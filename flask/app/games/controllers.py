@@ -21,8 +21,9 @@ class Games(Resource):
         players = data["users"]
 
         result = views.create_game(
-            schemas.NewGameUserSchema.model_validate(players[0]),
-            schemas.NewGameUserSchema.model_validate(players[1]),
+            schemas.GameCreateSchema.model_validate(players[0]),
+            schemas.GameCreateSchema.model_validate(players[1]),
+            data["league_id"],
         )
 
         return result.model_dump(), 201

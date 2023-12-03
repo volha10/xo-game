@@ -51,6 +51,7 @@ game_response_model = games_ns.model(
     "Game",
     {
         "id": fields.Integer(),
+        "league_id": fields.Integer(),
         "total_turns": fields.Integer(),
         "turns_overview": fields.List(fields.Nested(turn_model), default=[]),
         "created_dttm": fields.DateTime,
@@ -68,6 +69,7 @@ game_response_model = games_ns.model(
 new_game_request_model = games_ns.model(
     "NewGame",
     {
+        "league_id": fields.Integer(required=True, example=1),
         "users": fields.List(
             fields.Nested(_player_model),
             required=True,
@@ -81,7 +83,7 @@ new_game_request_model = games_ns.model(
                     "mark": "O",
                 },
             ],
-        )
+        ),
     },
 )
 

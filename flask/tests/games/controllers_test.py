@@ -9,18 +9,21 @@ from tests.conftest import USER_1, USER_2
 
 
 @patch("app.games.views.create_game")
-def test_create_new_game_response_data_if_success(
+def test_create_game_response_data_if_success(
     create_game_mock, client: FlaskClient, user, game_schema: games_schemas.GameSchema
 ):
     create_game_mock.return_value = game_schema
     headers = {"Authorization": f"Bearer {create_access_token(user.id)}"}
 
     response = client.post(
-        "/api/v1/games/", json={"users": [USER_1, USER_2]}, headers=headers
+        "/api/v1/games/",
+        json={"users": [USER_1, USER_2], "league_id": 1},
+        headers=headers,
     )
 
     assert response.json == {
         "id": 1,
+        "league_id": 1,
         "total_turns": 0,
         "turns_overview": [],
         "created_dttm": "2021-05-31T10:00:00",
@@ -33,7 +36,7 @@ def test_create_new_game_response_data_if_success(
 
 
 @patch("app.games.views.create_game")
-def test_create_new_game_response_code_if_success(
+def test_create_game_response_code_if_success(
     create_game_mock, client: FlaskClient, user, game_schema: games_schemas.GameSchema
 ):
     create_game_mock.return_value = game_schema
@@ -41,7 +44,9 @@ def test_create_new_game_response_code_if_success(
     headers = {"Authorization": f"Bearer {create_access_token(user.id)}"}
 
     response = client.post(
-        "/api/v1/games/", json={"users": [USER_1, USER_2]}, headers=headers
+        "/api/v1/games/",
+        json={"users": [USER_1, USER_2], "league_id": 1},
+        headers=headers,
     )
 
     assert response.status_code == 201
@@ -62,6 +67,7 @@ def test_get_user_games_response_data_if_success(
         "games": [
             {
                 "id": 1,
+                "league_id": 1,
                 "total_turns": 0,
                 "turns_overview": [],
                 "created_dttm": "2021-05-31T10:00:00",
