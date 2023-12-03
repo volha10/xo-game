@@ -15,7 +15,7 @@ class MarkType(enum.Enum):
 
 class GameResultLabel(enum.Enum):
     WIN = 2
-    LOSS = 0
+    LOSS = 1
 
     def __str__(self):
         return self.name

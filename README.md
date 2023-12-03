@@ -67,7 +67,7 @@ curl -X 'POST' \
 #### 3.4 Make turn
 ```
 curl -X 'PATCH' \
-  'http://localhost:81/api/v1/games/2' \
+  'http://localhost:81/api/v1/games/1' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer TOKEN_HERE' \
   -H 'Content-Type: application/json' \
@@ -82,7 +82,7 @@ curl -X 'PATCH' \
 
 ```
 curl -X 'GET' \
-  'http://localhost:81/api/v1/games/2' \
+  'http://localhost:81/api/v1/games/1' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer TOKEN_HERE'
 ```
@@ -95,4 +95,26 @@ curl -X 'GET' \
   'http://localhost:81/api/v1/games' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer TOKEN_HERE'
+```
+
+
+#### 3.7 Start new league season (new ranking table)
+
+```
+curl -X 'POST' \
+  'http://127.0.0.1:5000/api/v1/management/leagues/' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "name": "string"
+}'
+```
+
+
+#### 3.8 Get current ranking table
+
+```
+curl -X 'GET' \
+  'http://127.0.0.1:5000/api/v1/management/user-rating' \
+  -H 'accept: application/json'
 ```

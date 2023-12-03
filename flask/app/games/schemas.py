@@ -13,7 +13,7 @@ class Turn(BaseModel):
     position: int
 
 
-class NewGameUserSchema(BaseModel):
+class GameCreateSchema(BaseModel):
     id: int
     mark: MarkType
 
@@ -50,6 +50,7 @@ class GameBoardSchema(BaseModel):
 
 class GameSchema(BaseModel):
     id: int
+    league_id: int
     total_turns: int
     turns_overview: List[Turn] = []
     created_dttm: datetime
