@@ -30,7 +30,7 @@ def test_get_rank_table_response_data_if_success(
 ):
     get_rank_table.return_value = league_schema
 
-    response = client.get(f"/api/v1/management/user-rating/")
+    response = client.get(f"/api/v1/management/user-rating")
 
     assert response.json == {
         "rank_table": [{"rank_number": 1, "user_id": 1, "total_result": 100}]
@@ -43,6 +43,34 @@ def test_get_rank_table_response_code_if_success(
 ):
     get_rank_table.return_value = league_schema
 
-    response = client.get(f"/api/v1/management/user-rating/")
+    response = client.get(f"/api/v1/management/user-rating")
+
+    assert response.status_code == 200
+
+
+@patch("app.auth.views.get_users")
+def test_get_users_response_data_if_success(
+    get_users,
+    client: FlaskClient,
+    users_schema,
+):
+    get_users.return_value = users_schema
+
+    response = client.get(f"/api/v1/management/users")
+
+    assert response.json == {
+        "users": [
+            {"link": "http://localhost/api/v1/auth/1"},
+        ]
+    }
+
+
+@patch("app.auth.views.get_users")
+def test_get_users_response_code_if_success(
+    get_users, client: FlaskClient, users_schema
+):
+    get_users.return_value = users_schema
+
+    response = client.get(f"/api/v1/management/users")
 
     assert response.status_code == 200
