@@ -16,7 +16,7 @@ def test_create_game_response_data_if_success(
     headers = {"Authorization": f"Bearer {create_access_token(user.id)}"}
 
     response = client.post(
-        "/api/v1/games/",
+        "/api/v1/games",
         json={"users": [USER_1, USER_2], "league_id": 1},
         headers=headers,
     )
@@ -44,7 +44,7 @@ def test_create_game_response_code_if_success(
     headers = {"Authorization": f"Bearer {create_access_token(user.id)}"}
 
     response = client.post(
-        "/api/v1/games/",
+        "/api/v1/games",
         json={"users": [USER_1, USER_2], "league_id": 1},
         headers=headers,
     )
@@ -62,7 +62,7 @@ def test_get_user_games_response_data_if_success(
     get_user_games_mock.return_value = games_schema
     headers = {"Authorization": f"Bearer {create_access_token(user.id)}"}
 
-    response = client.get("/api/v1/games/", headers=headers)
+    response = client.get("/api/v1/games", headers=headers)
     assert response.json == {
         "games": [
             {
@@ -83,7 +83,7 @@ def test_get_user_games_response_data_if_success(
 
 
 def test_get_user_games_if_unauthorized(client: FlaskClient):
-    response = client.get("/api/v1/games/")
+    response = client.get("/api/v1/games")
 
     assert response.json == {"message": "Missing Authorization Header"}
     assert response.status_code == 401

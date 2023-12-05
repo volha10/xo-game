@@ -3,7 +3,7 @@ from flask_jwt_extended.exceptions import JWTExtendedException
 from flask_restx import Api
 
 from app.auth.controllers import auth_ns
-from app.auth.views import InvalidEmailOrPasswordError
+from app.auth.views import InvalidEmailOrPasswordError, InvalidOptionError
 from app.games.controllers import games_ns
 from app.games.views import UpdatingFinishedGameError, GameNotFoundError
 from app.management.controllers import management_ns
@@ -32,6 +32,11 @@ api = Api(
 api.add_namespace(auth_ns)
 api.add_namespace(games_ns)
 api.add_namespace(management_ns)
+
+
+@api.errorhandler(InvalidOptionError)
+def handle_invalid_option_error(error):
+    return {"message": str(error)}, 400
 
 
 @api.errorhandler(NoLeaguesFoundError)

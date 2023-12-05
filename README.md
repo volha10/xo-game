@@ -12,7 +12,7 @@ http://localhost:81/api/v1/docs
 #### 3.0 Start new league season (new ranking table)
 ```
 curl -X 'POST' \
-  'http://127.0.0.1:5000/api/v1/management/leagues/' \
+  'http://localhost:81/api/v1/management/leagues' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -59,11 +59,12 @@ curl -X 'POST' \
 #### 3.3 Create game
 ```
 curl -X 'POST' \
-  'http://localhost:81/api/v1/games/' \
+  'http://localhost:81/api/v1/games' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer TOKEN_HERE' \
+  -H 'Authorization: Bearer ' \
   -H 'Content-Type: application/json' \
   -d '{
+  "league_id": 1,
   "users": [
     {
       "id": 1,
@@ -81,7 +82,7 @@ curl -X 'POST' \
 curl -X 'PATCH' \
   'http://localhost:81/api/v1/games/1' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer TOKEN_HERE' \
+  -H 'Authorization: Bearer ' \
   -H 'Content-Type: application/json' \
   -d '{
   "turn_number": 1,
@@ -96,7 +97,7 @@ curl -X 'PATCH' \
 curl -X 'GET' \
   'http://localhost:81/api/v1/games/1' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer TOKEN_HERE'
+  -H 'Authorization: Bearer '
 ```
 
 
@@ -106,28 +107,28 @@ curl -X 'GET' \
 curl -X 'GET' \
   'http://localhost:81/api/v1/games' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer TOKEN_HERE'
+  -H 'Authorization: Bearer '
 ```
 
 #### 3.7 Get current ranking table
 
 ```
 curl -X 'GET' \
-  'http://127.0.0.1:5000/api/v1/management/user-rating' \
+  'http://localhost:81/api/v1/management/user-rating' \
   -H 'accept: application/json'
 ```
 
 #### 3.8 List all players
 ```
 curl -X 'GET' \
-  'http://127.0.0.1:5000/api/v1/management/users' \
+  'http://localhost:81/api/v1/management/users' \
   -H 'accept: application/json'
 ```
 
-#### 3.9 Create user option
+#### 3.9 Create option
 ```
 curl -X 'POST' \
-  'http://127.0.0.1:5000/api/v1/management/options' \
+  'http://localhost:81/api/v1/management/options' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -135,17 +136,29 @@ curl -X 'POST' \
 }'
 ```
 
-#### 3.10 Delete user option
+#### 3.10 Delete option
 ```
 curl -X 'DELETE' \
-  'http://127.0.0.1:5000/api/v1/management/options/1' \
+  'http://localhost:81/api/v1/management/options/1' \
   -H 'accept: application/json'
 ```
 
 
-#### 3.11 Get user option list
+#### 3.11 Get option list
 ```
 curl -X 'GET' \
-  'http://127.0.0.1:5000/api/v1/management/options' \
+  'http://localhost:81/api/v1/management/options' \
   -H 'accept: application/json'
+```
+
+#### 3.12 Set user profile options
+```
+curl -X 'PATCH' \
+  'http://localhost:81/api/v1/auth' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer ' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "options": {"age": 10}
+}'
 ```

@@ -1,15 +1,13 @@
 from typing import List, Dict, Union, Optional
 
 from flask import url_for
-from pydantic import BaseModel, computed_field, Field
+from pydantic import BaseModel, computed_field
 
 
 class UserSchema(BaseModel):
     id: int
     available_option_list: Optional[List[str]] = []
-    current_options: Optional[List[Dict[str, Union[int, str]]]] = Field(
-        alias="options", default=[]
-    )
+    profile_options: Optional[Dict[str, Union[int, str]]] = {}
 
     class Config:
         orm_mode = True
@@ -19,13 +17,15 @@ class UserSchema(BaseModel):
     @property
     def options(
         self,
-    ) -> Optional[List[Dict[str, Union[Optional[int], Optional[str]]]]]:
-        result = []
+    ) -> Optional[Dict[str, Union[Optional[int], Optional[str]]]]:
+        result = {}
 
-        for option in self.current_options:
-            for k in option.keys():
-                if k in self.available_option_list:
-                    result.append(option)
+        if not self.profile_options:
+            return result
+
+        for k, v in self.profile_options.items():
+            if k in self.available_option_list:
+                result[k] = v
 
         return result
 
@@ -33,7 +33,7 @@ class UserSchema(BaseModel):
         data = super(UserSchema, self).model_dump(**kwargs)
 
         for attr in list(data):
-            if attr in ["available_option_list", "current_options"]:
+            if attr in ["available_option_list", "profile_options"]:
                 del data[attr]
         return data
 
@@ -44,7 +44,7 @@ class UserLink(BaseModel):
     @computed_field
     @property
     def link(self) -> str:
-        return url_for("api.auth_user", user_id=self.id, _external=True)
+        return url_for("api.auth_user_id", user_id=self.id, _external=True)
 
     class Config:
         orm_mode = True
