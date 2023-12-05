@@ -15,3 +15,7 @@ class RankTable(BaseModel):
 
 class LeagueCreate(BaseModel):
     name: str
+
+
+class OptionCreate(BaseModel):
+    name: str

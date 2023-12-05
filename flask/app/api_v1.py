@@ -7,7 +7,7 @@ from app.auth.views import InvalidEmailOrPasswordError
 from app.games.controllers import games_ns
 from app.games.views import UpdatingFinishedGameError, GameNotFoundError
 from app.management.controllers import management_ns
-from app.management.views import NoLeaguesFoundError
+from app.management.views import NoLeaguesFoundError, OptionNotFoundError
 
 api_v1 = Blueprint("api", __name__, url_prefix="/api/v1")
 
@@ -39,9 +39,14 @@ def handle_no_leagues_found_error(error):
     return {"message": str(error)}, 400
 
 
+@api.errorhandler(OptionNotFoundError)
+def option_not_found_error(error):
+    return {"message": str(error)}, 400
+
+
 @api.errorhandler(InvalidEmailOrPasswordError)
 def handle_invalid_error_or_password_error(error):
-    return {"message": str(error)}, 401
+    return {"message": str(error)}, 400
 
 
 @api.errorhandler(GameNotFoundError)

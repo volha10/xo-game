@@ -36,3 +36,18 @@ users_response_model = management_ns.model(
     "Users",
     {"users": fields.List(fields.Nested(user_detail))},
 )
+
+new_option_request_model = management_ns.model(
+    "NewOption", {"name": fields.String(required=True)}
+)
+
+
+option_response_model = management_ns.model(
+    "Option", {"id": fields.Integer, "name": fields.String}
+)
+
+
+options_response_model = management_ns.model(
+    "Options",
+    {"options": fields.List(fields.Nested(option_response_model))},
+)
