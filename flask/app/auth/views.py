@@ -1,4 +1,5 @@
 import datetime
+from typing import List
 
 from flask_jwt_extended import create_access_token
 
@@ -11,6 +12,10 @@ JWT_EXPIRES_DELTA = 7
 
 
 class InvalidEmailOrPasswordError(Exception):
+    pass
+
+
+class InvalidOptionError(Exception):
     pass
 
 
@@ -40,14 +45,8 @@ def login(email: str, password: str) -> str:
 
 def get_user(user_id: int) -> schemas.UserSchema:
     user = User.query.filter_by(id=user_id).one()
-    options = UserOption.query.with_entities(UserOption.name).all()
+    schema = _populate_options(user)
 
-    available_options_list = []
-    if options:
-        available_options_list = [option[0] for option in options]
-
-    schema = schemas.UserSchema.model_validate(user)
-    schema.available_option_list = available_options_list
     return schema
 
 
@@ -57,3 +56,44 @@ def get_users() -> schemas.UsersSchema:
     result = schemas.UsersSchema(users=user_schema_list)
 
     return result
+
+
+def set_options(user_id: int, options: dict) -> schemas.UserSchema:
+    _check_options(options)
+
+    user = User.query.filter_by(id=user_id).first()
+    user.profile_options = options
+
+    db.session.add(user)
+    db.session.commit()
+
+    schema = _populate_options(user)
+
+    return schema
+
+
+def _get_available_option_names() -> List[str]:
+    available_options = UserOption.query.with_entities(UserOption.name).all()
+    available_options_list = []
+
+    if available_options:
+        available_options_list = [option[0] for option in available_options]
+
+    return available_options_list
+
+
+def _check_options(options) -> None:
+    available_options_list = _get_available_option_names()
+
+    for option in options:
+        if option not in available_options_list:
+            raise InvalidOptionError("Option %s is invalid." % option)
+
+
+def _populate_options(user) -> schemas.UserSchema:
+    available_options_list = _get_available_option_names()
+
+    schema = schemas.UserSchema.model_validate(user)
+    schema.available_option_list = available_options_list
+
+    return schema

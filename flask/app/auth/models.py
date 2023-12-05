@@ -1,6 +1,5 @@
 from flask_bcrypt import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import relationship
 
 from app import db
@@ -13,7 +12,7 @@ class User(db.Model):
     name = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
-    options = db.Column(MutableList.as_mutable(JSONB))
+    profile_options = db.Column(JSONB)
     games = relationship("UserGame", back_populates="user")
 
     def __init__(self, name: str, email: str, password: str):

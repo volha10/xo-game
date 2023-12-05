@@ -8,7 +8,7 @@ from app.games import views
 from app.games.namespaces import games_ns
 
 
-@games_ns.route("/")
+@games_ns.route("")
 class Games(Resource):
 
     @jwt_required()

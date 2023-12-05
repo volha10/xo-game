@@ -12,7 +12,7 @@ def test_start_league_response_if_success(
     start_league_mock.return_value = league
     new_league_attrs = {"name": "Test League"}
 
-    response = client.post("/api/v1/management/leagues/", json=new_league_attrs)
+    response = client.post("/api/v1/management/leagues", json=new_league_attrs)
 
     assert response.json == {
         "id": 1,

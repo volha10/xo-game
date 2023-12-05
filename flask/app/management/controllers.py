@@ -7,7 +7,7 @@ from app.management import views, namespaces
 from app.management.namespaces import management_ns
 
 
-@management_ns.route("/leagues/")
+@management_ns.route("/leagues")
 class Leagues(Resource):
     @management_ns.expect(namespaces.new_league_request_model, validate=True)
     @management_ns.marshal_with(
