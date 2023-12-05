@@ -36,3 +36,31 @@ class UserList(Resource):
         result = users_views.get_users()
 
         return result.model_dump(), 200
+
+
+@management_ns.route("/options")
+class Options(Resource):
+    @management_ns.expect(namespaces.new_option_request_model, validate=True)
+    @management_ns.marshal_with(
+        namespaces.option_response_model, description="Created", code=201
+    )
+    def post(self):
+        data = request.get_json()
+        result = views.add_option(schemas.OptionCreate.model_validate(data))
+
+        return result, 201
+
+    @management_ns.marshal_with(namespaces.options_response_model, code=200)
+    def get(self):
+        result = views.get_options()
+
+        return {"options": result}, 200
+
+
+@management_ns.route("/options/<int:option_id>")
+class Option(Resource):
+    @management_ns.response(204, description="Deleted")
+    def delete(self, option_id: int):
+        views.delete_option(option_id)
+
+        return {"message": "Deleted"}, 204

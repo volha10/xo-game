@@ -10,6 +10,10 @@ class NoLeaguesFoundError(Exception):
     pass
 
 
+class OptionNotFoundError(Exception):
+    pass
+
+
 def start_league(league_schema: schemas.LeagueCreate) -> models.League:
     league = models.League(**league_schema.model_dump())
 
@@ -79,3 +83,28 @@ def get_rank_table() -> schemas.RankTable:
     )
 
     return schema
+
+
+def add_option(option_create: schemas.OptionCreate) -> models.UserOption:
+    option = models.UserOption(**option_create.model_dump())
+
+    db.session.add(option)
+    db.session.commit()
+
+    return option
+
+
+def delete_option(option_id: int) -> None:
+    option = models.UserOption.query.filter_by(id=option_id).first()
+
+    if not option:
+        raise OptionNotFoundError(f"Option {option_id} not found.")
+
+    db.session.delete(option)
+    db.session.commit()
+
+
+def get_options():
+    options = models.UserOption.query.all()
+
+    return options

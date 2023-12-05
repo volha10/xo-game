@@ -123,3 +123,29 @@ curl -X 'GET' \
   'http://127.0.0.1:5000/api/v1/management/users' \
   -H 'accept: application/json'
 ```
+
+#### 3.9 Create user option
+```
+curl -X 'POST' \
+  'http://127.0.0.1:5000/api/v1/management/options' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "name": "Age"
+}'
+```
+
+#### 3.10 Delete user option
+```
+curl -X 'DELETE' \
+  'http://127.0.0.1:5000/api/v1/management/options/1' \
+  -H 'accept: application/json'
+```
+
+
+#### 3.11 Get user option list
+```
+curl -X 'GET' \
+  'http://127.0.0.1:5000/api/v1/management/options' \
+  -H 'accept: application/json'
+```
