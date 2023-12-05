@@ -29,3 +29,10 @@ rank_table_response_model = management_ns.model(
     "RankTable",
     {"rank_table": fields.List(fields.Nested(user_rank))},
 )
+
+user_detail = management_ns.model("UserLink", {"link": fields.String})
+
+users_response_model = management_ns.model(
+    "Users",
+    {"users": fields.List(fields.Nested(user_detail))},
+)

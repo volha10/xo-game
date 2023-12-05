@@ -7,7 +7,7 @@ from app.auth.namespaces import (
     signup_request_model,
     signup_response_model,
     login_request_model,
-    login_response_model
+    login_response_model,
 )
 
 
@@ -28,6 +28,12 @@ class Login(Resource):
     @auth_ns.marshal_with(login_response_model, description="Accepted", code=200)
     def post(self):
         data = request.get_json()
-        return {
-                   "access_token": users_views.login(**data)
-               }, 200
+        return {"access_token": users_views.login(**data)}, 200
+
+
+@auth_ns.route("/<int:user_id>")
+class User(Resource):
+
+    def get(self, user_id: int):
+        result = users_views.get_user(user_id)
+        return result.model_dump(), 200

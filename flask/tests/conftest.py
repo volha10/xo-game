@@ -1,6 +1,7 @@
 import pytest
 
 from app import create_app
+from app.auth import schemas as users_schemas
 from app.auth.models import User
 from app.games import schemas as games_schemas
 from app.management import models as management_models
@@ -29,6 +30,18 @@ def user():
     user.id = 555
 
     return user
+
+
+@pytest.fixture
+def user_schema() -> users_schemas.UserSchema:
+    schema = users_schemas.UserSchema(**{"id": 1, "options": [{"option_1": "value_1"}]})
+    schema.available_option_list = ["option_1"]
+    return schema
+
+
+@pytest.fixture
+def users_schema() -> users_schemas.UsersSchema:
+    return users_schemas.UsersSchema(users=[{"id": 1}])
 
 
 @pytest.fixture

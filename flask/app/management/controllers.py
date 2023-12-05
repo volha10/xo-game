@@ -1,6 +1,7 @@
 from flask import request
 from flask_restx import Resource
 
+from app.auth import views as users_views
 from app.management import schemas
 from app.management import views, namespaces
 from app.management.namespaces import management_ns
@@ -24,5 +25,14 @@ class UserRating(Resource):
     @management_ns.marshal_with(namespaces.rank_table_response_model, code=200)
     def get(self):
         result = views.get_rank_table()
+
+        return result.model_dump(), 200
+
+
+@management_ns.route("/users")
+class UserList(Resource):
+    @management_ns.marshal_with(namespaces.users_response_model, code=200)
+    def get(self):
+        result = users_views.get_users()
 
         return result.model_dump(), 200

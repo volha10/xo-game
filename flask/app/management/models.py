@@ -14,3 +14,10 @@ class League(db.Model):
     def __init__(self, name: str, started_at: Optional[datetime] = None):
         self.name = name
         self.started_at = started_at or datetime.utcnow()
+
+
+class UserOption(db.Model):
+    __tablename__ = "user_option"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
